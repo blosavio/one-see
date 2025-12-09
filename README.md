@@ -1,0 +1,668 @@
+
+  <body>
+    <a href="https://clojars.org/com.sagevisuals/one-see"><img src="https://img.shields.io/clojars/v/com.sagevisuals/one-see.svg"></a><br>
+    <a href="#setup">Setup</a><br>
+    <a href="https://blosavio.github.io/one-see/index.html">API</a><br>
+    <a href="https://github.com/blosavio/one-see/blob/main/changelog.md">Changelog</a><br>
+    <a href="#introduction">Introduction</a><br>
+    <a href="#usage">Usage</a><br>
+    <a href="#alternatives">Alternatives</a><br>
+    <a href="#glossary">Glossary</a><br>
+    <a href="https://github.com/blosavio">Contact</a><br>
+    <h1>
+      One-see
+    </h1><em>A featherweight Clojure library for symmetric one-to-one look ups</em><br>
+    <section id="setup">
+      <h2>
+        Setup
+      </h2>
+      <h3>
+        Leiningen/Boot
+      </h3>
+      <pre><code>[com.sagevisuals/one-see &quot;0-SNAPSHOT0&quot;]</code></pre>
+      <h3>
+        Clojure CLI/deps.edn
+      </h3>
+      <pre><code>com.sagevisuals/one-see {:mvn/version &quot;0-SNAPSHOT0&quot;}</code></pre>
+      <h3>
+        Require
+      </h3>
+      <pre><code>(require &apos;[one-see.scratch :refer [look-up get-val table]])</code></pre>
+    </section>
+    <section id="introduction">
+      <h2>
+        Introduction
+      </h2>
+      <p>
+        Pretend we&apos;ve got some flower data with the requirement that each flower &nbsp;has one color and each color associates to exactly one flower.
+      </p>
+      <table>
+        <tr>
+          <th>
+            flower
+          </th>
+          <th>
+            color
+          </th>
+        </tr>
+        <tr>
+          <td>
+            rose
+          </td>
+          <td>
+            red
+          </td>
+        </tr>
+        <tr>
+          <td>
+            hibiscus
+          </td>
+          <td>
+            orange
+          </td>
+        </tr>
+        <tr>
+          <td>
+            sunflower
+          </td>
+          <td>
+            yellow
+          </td>
+        </tr>
+      </table>
+      <p>
+        If we&apos;d like to know <em>What color is a rose?</em>, we might establish the flower+color relationship with a hash-map.
+      </p>
+      <pre><code>(def flowers-1 {&quot;rose&quot; :red,
+&nbsp;               &quot;hibiscus&quot; :orange,
+&nbsp;               &quot;sunflower&quot; :yellow})</code></pre>
+      <p>
+        Then, we could look up the value associated to &quot;rose&quot;.
+      </p>
+      <pre><code>(flowers-1 &quot;rose&quot;) ;; =&gt; :red</code></pre>
+      <p>
+        If we&apos;d like to go in the other direction and ask <em>Which flower is orange?</em>, we could invert the hash-map to establish a color+flower
+        relationship.
+      </p>
+      <pre><code>(require &apos;[clojure.set :refer [map-invert]])</code><br><br><code>(def flowers-1-inverted (map-invert flowers-1))</code></pre>
+      <p>
+        Then, look up is analogous.
+      </p>
+      <pre><code>(flowers-1-inverted :orange) ;; =&gt; &quot;hibiscus&quot;</code></pre>
+      <p>
+        Manual inversion is perhaps a bit awkward, but let&apos;s press on.
+      </p>
+      <p>
+        Now pretend we want to add a third column of data: a unique ID for each &nbsp;flower+color. Every pairwise combination of flower, color, and ID is
+        unique.
+      </p>
+      <table>
+        <tr>
+          <th>
+            flower
+          </th>
+          <th>
+            color
+          </th>
+          <th>
+            ID
+          </th>
+        </tr>
+        <tr>
+          <td>
+            rose
+          </td>
+          <td>
+            red
+          </td>
+          <td>
+            101
+          </td>
+        </tr>
+        <tr>
+          <td>
+            hibiscus
+          </td>
+          <td>
+            orange
+          </td>
+          <td>
+            102
+          </td>
+        </tr>
+        <tr>
+          <td>
+            sunflower
+          </td>
+          <td>
+            yellow
+          </td>
+          <td>
+            103
+          </td>
+        </tr>
+      </table>
+      <p>
+        Only rose is red. Only orange is linked to ID 102. Etc.
+      </p>
+      <p>
+        Our previous tactic of using a hash-map won&apos;t work. A hash-map only &nbsp;supports one-to-one relationships. We could get there with some
+        gymnastics. &nbsp;Let&apos;s stuff some hash-maps into a vector.
+      </p>
+      <pre><code>(def flowers-2
+&nbsp; [{:flower &quot;rose&quot;, :color :red, :id 101}
+&nbsp;  {:flower &quot;hibiscus&quot;, :color :orange, :id 102}
+&nbsp;  {:flower &quot;sunflower&quot;, :Color :yellow, :id 103}])</code></pre>
+      <p id="naive">
+        We can walk through the vector with <code>some</code> which returns the first logical <code>true</code> element.
+      </p>
+      <pre><code>;; What flower is red?</code><br><code>(:flower (some #(when (= :red (% :color)) %) flowers-2)) ;; =&gt; &quot;rose&quot;</code><br><br><code>;; What is the ID of the orange flower?</code><br><code>(:id (some #(when (= :orange (% :color)) %) flowers-2)) ;; =&gt; 102</code></pre>
+      <p>
+        But we&apos;re really starting to bump into issues. It&apos;s not terribly efficient &nbsp;to walk through the data each query. The invocation pattern
+        is a bit wordy and &nbsp;perhaps not as readable as we&apos;d hope.
+      </p>
+      <p>
+        And there&apos;s no enforcement of consistency. Notice, I made a keyboarding &nbsp;error. <code>:Color</code> should be <code>:color</code> with lower
+        case &apos;c&apos; to match the others. This error in the data makes our &nbsp;otherwise valid query fail.
+      </p>
+      <pre><code>(:flower (some #(when (= :yellow (% :color)) %) flowers-2)) ;; =&gt; nil</code></pre>
+      <p>
+        We fail to find a match because of the inconsistent `:Color` entry in &nbsp;`flowers-2`
+      </p>
+      <p>
+        <strong>The One-see library supplies a lightweight solution to arranging data with &nbsp;enforced <a href="#one-to-one">symmetric one-to-one</a>
+        relationships and provides efficient look-up with a streamlined &nbsp;invocation pattern.</strong>
+      </p>
+    </section>
+    <section id="usage">
+      <h2>
+        Usage
+      </h2>
+      <p>
+        There are two phases to using the <code>one-see</code> library. First, we establish the relationships by creating a special data &nbsp;structure.
+        Second, we get data by doing look ups in that special data &nbsp;structure.
+      </p>
+      <p>
+        Internally, our relationship data is contained in Clojure hash-maps or &nbsp;records with just a tiny bit of checking sprinkled on top. A
+        <code>LookUp</code> instance provides the methods to manage that data, such as checking prior to &nbsp;pushing new data.
+      </p>
+      <p>
+        Let&apos;s recall our flower+color+id data from the <em>Introduction</em>.
+      </p>
+      <table>
+        <tr>
+          <th>
+            flower
+          </th>
+          <th>
+            color
+          </th>
+          <th>
+            ID
+          </th>
+        </tr>
+        <tr>
+          <td>
+            rose
+          </td>
+          <td>
+            red
+          </td>
+          <td>
+            101
+          </td>
+        </tr>
+        <tr>
+          <td>
+            hibiscus
+          </td>
+          <td>
+            orange
+          </td>
+          <td>
+            102
+          </td>
+        </tr>
+        <tr>
+          <td>
+            sunflower
+          </td>
+          <td>
+            yellow
+          </td>
+          <td>
+            103
+          </td>
+        </tr>
+      </table>
+      <p>
+        If we consider the top row of the table, we see the conceptual &nbsp;categories for our flower data: <em>flower</em>, <em>color</em>, and <em>ID</em>.
+        Focusing on just the second row of our table, we see three pieces of &nbsp;related data: <em>rose</em>, <em>red</em>, and <em>101</em>, corresponding
+        to the conceptual categories. In Clojure, it&apos;s natural to &nbsp;model this relationship with a hash-map.
+      </p>
+      <pre><code>{:flower &quot;rose&quot; :color :red :id 101}</code></pre>
+      <p>
+        We may treat the two trailing rows similarly.
+      </p>
+      <pre><code>{:flower &quot;hibiscus&quot; :color :orange :id 102}</code><br><code>{:flower &quot;sunflower&quot; :color :yellow :id 103}</code></pre>
+      <p>
+        Let&apos;s bundle those three rows inside a single vector.
+      </p>
+      <pre><code>[{:flower &quot;rose&quot;      :color :red    :id 101}</code><br><code> {:flower &quot;hibiscus&quot;  :color :orange :id 102}</code><br><code> {:flower &quot;sunflower&quot; :color :yellow :id 103}]</code></pre>
+      <p>
+        Notice how the data values of each row are unique within its column. There &nbsp;is only one <code>&quot;rose&quot;</code> entry in the
+        <code>:flower</code> column, and only one <code>:orange</code> entry in the <code>:color</code> column, and only one <code>103</code> entry in the
+        <code>:id</code> column, etc. It is this uniqueness condition that allows us to do a look up &nbsp;such as <em>What is the ID of the flower with the
+        color yellow?</em> Without that uniqueness condition, we might receive multiple answers.
+      </p>
+      <p>
+        This is a good time to veer off onto a parallel track to reconsider our &nbsp;choice of hash-maps. Hash-maps are broadly useful because they are
+        permissive. &nbsp;However, in this case, that permissiveness works against us. Records, however, &nbsp;provide a smidgen of useful constraint.
+      </p>
+      <p>
+        A record conveys the idea <em>These, and only these, are the fields of our expected data</em>, and mechanically enforces that idea. Let&apos;s
+        explicitly stipulate that our &nbsp;data has exactly a <em>flower</em>, a <em>color</em>, and an <em>id</em> by defining a record.
+      </p>
+      <pre><code>(defrecord Flower [flower color id])</code></pre>
+      <p>
+        Now, we create an instance that holds the row of data for a rose.
+      </p>
+      <pre><code>(-&gt;Flower &quot;rose&quot; :red 101)
+;; =&gt; #readmoi_generator.Flower {:color :red, :flower &quot;rose&quot;, :id 101}</code></pre>
+      <p>
+        And just for completeness, we&apos;ll re-make our vector, exchanging hash-maps &nbsp;for records.
+      </p>
+      <pre><code>[(-&gt;Flower &quot;rose&quot; :red 101)
+&nbsp;(-&gt;Flower &quot;hibiscus&quot; :orange 102)
+&nbsp;(-&gt;Flower &quot;sunflower&quot; :yellow 103)]</code></pre>
+      <p>
+        We&apos;ve improved our situation somewhat. We&apos;ve explicitly declared our &nbsp;expected fields as exactly <code>:flower</code>,
+        <code>:color</code>, and <code>:id</code>. Clojure will not allow us to make a <code>Flower</code> instance with less than or more than those three
+        values.
+      </p>
+      <p>
+        In addition to all rows containing exactly the same fields, a symmetric &nbsp;one-to-one lookup requires each value to be unique from the others in its
+        &nbsp;column. But there is nothing about a series of hash-maps or records nested &nbsp;within a vector that enforces that critical condition. A
+        <code>LookUp</code> instance provides that guarantee.
+      </p>
+      <p>
+        We create a <code>LookUp</code> instance with the <code>look-up</code> function. The preferred 2-arity version accepts a sequence of row datums...
+      </p>
+      <pre><code>[[&quot;rose&quot; :red 101]
+&nbsp;[&quot;hibiscus&quot; :orange 102]
+&nbsp;[&quot;sunflower&quot; :yellow] 103]</code></pre>
+      <p>
+        ...and a record constructor, in this case, <code>-&gt;Flower</code>.
+      </p>
+      <pre><code>(look-up [[&quot;rose&quot; :red 101]
+&nbsp;         [&quot;hibiscus&quot; :orange 102]
+&nbsp;         [&quot;sunflower&quot; :yellow 103]]
+&nbsp;        -&gt;Flower)
+;; =&gt; #object
+;;     [one_see.scratch$make_look_up$reify__8346 0x1cc3c5c
+;;      &quot;[#readmoi_generator.Flower{:flower \&quot;rose\&quot;, :color :red, :id 101} #readmoi_generator.Flower{:flower \&quot;hibiscus\&quot;, :color :orange, :id 102} #readmoi_generator.Flower{:flower \&quot;sunflower\&quot;, :color :yellow, :id 103}]&quot;]</code></pre>
+      <p>
+        Yikes. That&apos;s gnarly. Let&apos;s inspect the internal representation by &nbsp;invoking the <code>table</code> method.
+      </p>
+      <pre><code>(table (look-up [[&quot;rose&quot; :red 101]
+&nbsp;                [&quot;hibiscus&quot; :orange 102]
+&nbsp;                [&quot;sunflower&quot; :yellow 103]]
+&nbsp;               -&gt;Flower))
+;; =&gt; [#readmoi_generator.Flower {:color :red, :flower &quot;rose&quot;, :id 101}
+;;     #readmoi_generator.Flower {:color :orange, :flower &quot;hibiscus&quot;, :id 102}
+;;     #readmoi_generator.Flower {:color :yellow, :flower &quot;sunflower&quot;, :id 103}]</code></pre>
+      <p>
+        That looks okay. We can see all our flower data arranged as we expect. &nbsp;What&apos;s not immediately apparent is that before pushing each record
+        onto the &nbsp;table, <code>look-up</code> checked to see if
+      </p>
+      <ol>
+        <li>All fields match the others.
+        </li>
+        <li>The values are unique within a column.
+        </li>
+      </ol>In this case, Condition&nbsp;1 is provided by virtue of using the <code>-&gt;Flower</code> constructor, but such checking would be necessary if we
+      chose to supply <code>look-up</code> with regular hash-maps. Regardless of whether we chose records or hash-maps, &nbsp;condition&nbsp;2 can only be
+      ensured by our <code>LookUp</code> instance&apos;s internal checking.
+      <p></p>
+      <p>
+        Let&apos;s try to make an instance where the third row&apos;s flower is also red, &nbsp;illegally repeating the rose&apos;s color.
+      </p>
+      <pre><code>(try (look-up [[&quot;rose&quot; :red 101]
+&nbsp;              [&quot;hibiscus&quot; :orange 102]
+&nbsp;              [&quot;tulip&quot; :red 103]]
+&nbsp;             -&gt;Flower)
+&nbsp;    (catch Exception e (.getMessage e)))
+;; =&gt; &quot;Illegal attempt to associate new value: readmoi_generator.Flower@a0688467 at path: [:color :red] (existing value: readmoi_generator.Flower@9f0c1b28)&quot;</code></pre>
+      <p>
+        Nope. <code>look-up</code> won&apos;t let us have both red roses and red tulips. That&apos;s exactly the &nbsp;guarantee we want, because when we ask
+        <em>What is the flower that is red?</em>, we want only one answer. In fact, let&apos;s ask that question. To streamline &nbsp;the discussion,
+        we&apos;ll create a <code>LookUp</code> instance containing flower data and give it a name.
+      </p>
+      <pre><code>(def flowers-3
+&nbsp; (look-up [[&quot;rose&quot; :red 101] [&quot;hibiscus&quot; :orange 102]
+&nbsp;           [&quot;sunflower&quot; :yellow 103]]
+&nbsp;          -&gt;Flower))</code></pre>
+      <p>
+        Then, using the <code>get-val</code> method, we retrieve the value.
+      </p>
+      <pre><code>(get-val flowers-3 :color :red :flower) ;; =&gt; &quot;rose&quot;</code></pre>
+      <p>
+        From left to right, it reads <em>From the <code>flowers-3</code> table, find the row whose <code>:color</code> is <code>:red</code>, and return the
+        value associated to <code>:flower</code>.</em>
+      </p>
+      <p>
+        One of the Clojure&apos;s niceties is that collections implement the function &nbsp;interface, so that they do something useful when invoked with the
+        appropriate &nbsp;argument. <code>LookUp</code> instances behave similarly. We simply drop the <code>get-val</code>.
+      </p>
+      <pre><code>(flowers-3 :color :red :flower) ;; =&gt; &quot;rose&quot;</code></pre>
+      <p>
+        Let&apos;s do a quick demonstration of flower+color and color+flower that the &nbsp;plain hash-map struggled with earlier.
+      </p>
+      <table>
+        <tr>
+          <th>
+            flower
+          </th>
+          <th>
+            color
+          </th>
+        </tr>
+        <tr>
+          <td>
+            rose
+          </td>
+          <td>
+            red
+          </td>
+        </tr>
+        <tr>
+          <td>
+            hibiscus
+          </td>
+          <td>
+            orange
+          </td>
+        </tr>
+        <tr>
+          <td>
+            sunflower
+          </td>
+          <td>
+            yellow
+          </td>
+        </tr>
+      </table>
+      <p>
+        First, we create a symmetric one-to-one relationship.
+      </p>
+      <pre><code>(def flowers-4
+&nbsp; (look-up [{:flower &quot;rose&quot;, :color :red} {:flower &quot;hibiscus&quot;, :color :orange}
+&nbsp;           {:flower &quot;sunflower&quot;, :color :yellow}]))</code></pre>
+      <p>
+        The <code>LookUp</code> instance returned by <code>look-up</code> enforces our uniqueness requirements. Only rose is red, only hibiscus is
+        &nbsp;orange, and only sunflower is yellow.
+      </p>
+      <pre><code>(flowers-4 :flower &quot;rose&quot; :color) ;; =&gt; :red</code><br><code>(flowers-4 :flower &quot;hibiscus&quot; :color) ;; =&gt; :orange</code><br><code>(flowers-4 :flower &quot;sunflower&quot; :color) ;; =&gt; :yellow</code></pre>
+      <p>
+        Furthermore, red is only rose, orange is only hibiscus, and yellow is only &nbsp;sunflower.
+      </p>
+      <pre><code>(flowers-4 :color :red :flower) ;; =&gt; &quot;rose&quot;</code><br><code>(flowers-4 :color :orange :flower) ;; =&gt; &quot;hibiscus&quot;</code><br><code>(flowers-4 :color :yellow :flower) ;; =&gt; &quot;sunflower&quot;</code></pre>
+      <p>
+        Finally, let&apos;s really stretch by adding a couple more columns. <em>family</em> and <em>leaves</em>.
+      </p>
+      <table>
+        <tr>
+          <th>
+            flower
+          </th>
+          <th>
+            color
+          </th>
+          <th>
+            ID
+          </th>
+          <th>
+            family
+          </th>
+          <th>
+            leaves
+          </th>
+        </tr>
+        <tr>
+          <td>
+            rose
+          </td>
+          <td>
+            red
+          </td>
+          <td>
+            101
+          </td>
+          <td>
+            Rosaceae
+          </td>
+          <td>
+            pinnate
+          </td>
+        </tr>
+        <tr>
+          <td>
+            hibiscus
+          </td>
+          <td>
+            orange
+          </td>
+          <td>
+            102
+          </td>
+          <td>
+            Malvaveae
+          </td>
+          <td>
+            lanceolate
+          </td>
+        </tr>
+        <tr>
+          <td>
+            sunflower
+          </td>
+          <td>
+            yellow
+          </td>
+          <td>
+            103
+          </td>
+          <td>
+            Asteraceae
+          </td>
+          <td>
+            cardioid
+          </td>
+        </tr>
+      </table>
+      <p>
+        First, we define a new record with those two additional fields, <code>family</code> and <code>leaves</code>.
+      </p>
+      <pre><code>(defrecord Flower-power [flower color id family leaves])</code></pre>
+      <p>
+        Next, we create a new <code>LookUp</code> instance with <code>look-up</code> and name it <code>flowers-5</code>.
+      </p>
+      <pre><code>(def flowers-5
+&nbsp; (look-up [[&quot;rose&quot; :red 101 &quot;Rosaceae&quot; :pinnate]
+&nbsp;           [&quot;hibiscus&quot; :orange 102 &quot;Malvaveae&quot; :lanceolate]
+&nbsp;           [&quot;sunflower&quot; :yellow 103 &quot;Asteraceae&quot; :cardioid]]
+&nbsp;          -&gt;Flower-power))</code></pre>
+      <p>
+        Now, let&apos;s try some look ups.
+      </p>
+      <pre><code>(flowers-5 :flower &quot;rose&quot; :family) ;; =&gt; &quot;Rosaceae&quot;</code><br><code>(flowers-5 :id 103 :leaves) ;; =&gt; :cardioid</code><br><code>(flowers-5 :family &quot;Asteraceae&quot; :flower) ;; =&gt; &quot;sunflower&quot;</code></pre>
+      <p>
+        Dandy.
+      </p>
+      <h3>
+        Performance considerations
+      </h3>
+      <p>
+        A <a href="#naive">naive</a> implementation might be <em>O(n)</em> in time, walking the sequence of rows, and requiring a compare at each step.
+      </p>
+      <p>
+        A <code>LookUp</code> instance leans on Clojure&apos;s structural sharing to make cheap copies of the data. With those cheap copies appropriately
+        arranged, getting a value is merely <em>O(1)</em> in time, with zero compares. In fact, any value may be retrieved with exactly three hash-map
+        look-ups.
+      </p>
+      <p>
+        Though efficient, the <code>One-see</code> library is intended for a few dozen rows and a handful of columns, populated by hand, and not exposed to the
+        world. If you feel tempted to put it on a hot path it&apos;ll probably work okay, but consider some <a href="#alternatives">alternatives</a>, or dust
+        off your favorite database.
+      </p>
+    </section>
+    <section id="alternatives">
+      <h2>
+        Alternatives
+      </h2>
+      <ul>
+        <li>Clojure&apos;s <a href="https://clojure.github.io/clojure/clojure.set-api.html">clojure.set</a> namespace
+          <p>
+            Functions for working on sets, e.g. intersection, subset, etc.
+          </p>
+        </li>
+        <li>Nikita Prokopov&apos;s <a href="https://github.com/tonsky/datascript">datascript</a>
+          <p>
+            An immutable in-memory database and Datalog query engine in Clojure and ClojureScript.
+          </p>
+        </li>
+        <li>Joel Holdbrooks&apos; <a href="https://github.com/noprompt/meander">Meander</a>
+          <p>
+            Tools for transparent data transformation.
+          </p>
+        </li>
+        <li>Dan Stone&apos;s <a href="https://github.com/wotbrew/relic">Relic</a>
+          <p>
+            A Clojure(Script) data structure that provides the functional relational programming model described by the tar pit paper.
+          </p>
+        </li>
+        <li>Brian Marick&apos;s <a href="https://github.com/marick/suchwow">suchwow</a>, particularly the <a href=
+        "https://marick.github.io/suchwow/such.relational.html"><code>such.relational</code></a> namespace
+          <p>
+            Functions for &apos;pre-joining&apos; relational tables for a more tree-structured or path-based lookup.
+          </p>
+        </li>
+      </ul>
+    </section>
+    <section id="glossary">
+      <h2>
+        Glossary
+      </h2>
+      <p>
+        Refer to this chart for the following definitions.
+      </p>
+      <table>
+        <tr>
+          <th>
+            flower
+          </th>
+          <th>
+            color
+          </th>
+          <th>
+            ID
+          </th>
+        </tr>
+        <tr>
+          <td>
+            rose
+          </td>
+          <td>
+            red
+          </td>
+          <td>
+            101
+          </td>
+        </tr>
+        <tr>
+          <td>
+            hibiscus
+          </td>
+          <td>
+            orange
+          </td>
+          <td>
+            102
+          </td>
+        </tr>
+        <tr>
+          <td>
+            sunflower
+          </td>
+          <td>
+            yellow
+          </td>
+          <td>
+            103
+          </td>
+        </tr>
+      </table>
+      <dl>
+        <dt id="column">
+          column
+        </dt>
+        <dd>
+          <p>
+            A vertical chuck of related data within a category. Concretely, the header labels of a table (<em>flower</em>, <em>color</em>, and <em>ID</em>
+            above), or the keys of a hash-map, or the fields of a record refer to a column. <em>Rose</em>, <em>hibiscus</em>, and <em>sunflower</em> make up a
+            column of <em>flower</em> data.
+          </p>
+        </dd>
+        <dt id="one-to-one">
+          symmetrical one-to-one
+        </dt>
+        <dd>
+          <p>
+            <code>One-see</code>&apos;s everyday term for <a href="https://en.wikipedia.org/wiki/Bijection">bijection</a>.
+          </p>
+          <p>
+            Practically, a condition imposed on an aggregate of data rows (e.g., a <a href="#table">table</a>), such that a value in one row is unique among
+            the corresponding values in all the other rows. Thus, a row may be unambiguously located by searching for a particular value in a particular
+            column.
+          </p>
+          <p>
+            A hash-map provides a uni-directional one-to-one relationship: Given one <em>key</em> unique among its peers, a hash-map returns one value. A
+            hash-map does not guarantee that given one value, it will return one key. A <em>LookUp</em> instance provides a symmetrical one-to-one
+            relationship: Given any key, a LookUp returns exactly one value and given that value, returns the corresponding key.
+          </p>
+        </dd>
+        <dt id="row">
+          row
+        </dt>
+        <dd>
+          <p>
+            A horizontal chunk of related data (e.g., <em>rose</em>, <em>red</em>, and <em>101</em> above). Each value is unique among its siblings in other
+            rows. The keys/fields are identical between rows, i.e., <em>hibiscus</em> in the <em>flower</em> column of row&nbsp;2 above is unique from the
+            other values in that column.
+          </p>
+        </dd>
+        <dt id="table">
+          table
+        </dt>
+        <dd>
+          <p>
+            A sequence of <a href="#row">rows</a> that maintains a guarantee that the values of each row is unique within their respective columns.
+          </p>
+        </dd>
+      </dl>
+    </section><br>
+    <h2>
+      License
+    </h2>
+    <p></p>
+    <p>
+      This program and the accompanying materials are made available under the terms of the <a href="https://opensource.org/license/MIT">MIT License</a>.
+    </p>
+    <p></p>
+    <p id="page-footer">
+      Copyright © 2024–2025 Brad Losavio.<br>
+      Compiled by <a href="https://github.com/blosavio/readmoi">ReadMoi</a> on 2025 December 09.<span id="uuid"><br>
+      73cc3518-fba1-4140-95ef-23586eae86d1</span>
+    </p>
+  </body>
+</html>

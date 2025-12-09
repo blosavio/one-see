@@ -1,0 +1,15 @@
+{:project-formatted-name "One-see"
+ :copyright-holder "Brad Losavio"
+
+ :changelog-UUID #uuid "18ddee71-09d6-4b5d-b648-db878298e54e"
+
+ :changelog-html-directory "doc/"
+ :changelog-html-filename "changelog.html"
+
+ :changelog-markdown-directory ""
+ :changelog-markdown-filename "changelog.md"
+
+ :changelog-entries-directory "resources/changelog_entries/"
+
+ :tidy-html? true}
+

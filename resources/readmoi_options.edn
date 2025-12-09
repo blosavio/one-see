@@ -1,0 +1,41 @@
+{:sections [{:section-name "Setup"}
+            {:section-name "API" :section-href "https://blosavio.github.io/one-see/index.html" :skip-section-load? true}
+            {:section-name "Changelog" :section-href "https://github.com/blosavio/one-see/blob/main/changelog.md" :skip-section-load? true}
+            {:section-name "Introduction" :section-href "introduction"}
+            {:section-name "Usage" :section-href "usage"}
+            {:section-name "Alternatives" :section-href "alternatives"}
+            {:section-name "Glossary" :section-href "glossary"}
+            {:section-name "Contact" :section-href "https://github.com/blosavio" :skip-section-load? true}]
+
+ :clojars-badge? true
+ :copyright-holder "Brad Losavio"
+
+ ;; special directives to zprint on how to handle these functions
+ :fn-map-additions {}
+
+ :project-description "A featherweight Clojure library for symmetric one-to-one look ups"
+ :project-name-formatted "One-see"
+
+ :preferred-project-metadata :lein
+
+ :readme-UUID #uuid "73cc3518-fba1-4140-95ef-23586eae86d1"
+
+ :readme-html-directory "doc/"
+ :readme-html-filename "readme.html"
+
+ :readme-markdown-directory ""
+ :readme-markdown-filename "README.md"
+
+ :sections-directory "resources/readme_sections/"
+
+ :separator " => "
+ :wrap-at 80
+
+ :def-patterns #{"def"
+                 "defn"
+                 "defmacro"
+                 "defprotocol"
+                 "defrecord"}
+
+ :tidy-html? true}
+
