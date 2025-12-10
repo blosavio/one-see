@@ -13,13 +13,13 @@
   " instance provides the methods to manage that data, such as checking prior to
  pushing new data."]
 
- [:p "Let's recall our flower+color+id data from the "
+ [:p "Let's recall our name+color+id flower data from the "
   [:em "Introduction"]
   "."]
 
  [:table
   [:tr
-   [:th "flower"]
+   [:th "name"]
    [:th "color"]
    [:th "ID"]]
 
@@ -40,7 +40,7 @@
 
  [:p "If we consider the top row of the table, we see the conceptual
  categories for our flower data: "
-  [:em "flower"]
+  [:em "name"]
   ", "
   [:em "color"]
   ", and "
@@ -55,29 +55,29 @@
   ", corresponding to the conceptual categories. In Clojure, it's natural to
  model this relationship with a hash-map."]
 
- [:pre [:code "{:flower \"rose\" :color :red :id 101}"]]
+ [:pre [:code "{:name \"rose\" :color :red :id 101}"]]
 
  [:p "We may treat the two trailing rows similarly."]
 
  [:pre
-  [:code "{:flower \"hibiscus\" :color :orange :id 102}"]
+  [:code "{:name \"hibiscus\" :color :orange :id 102}"]
   [:br]
-  [:code "{:flower \"sunflower\" :color :yellow :id 103}"]]
+  [:code "{:name \"sunflower\" :color :yellow :id 103}"]]
 
  [:p "Let's bundle those three rows inside a single vector."]
 
  [:pre
-  [:code "[{:flower \"rose\"      :color :red    :id 101}"]
+  [:code "[{:name \"rose\"      :color :red    :id 101}"]
   [:br]
-  [:code " {:flower \"hibiscus\"  :color :orange :id 102}"]
+  [:code " {:name \"hibiscus\"  :color :orange :id 102}"]
   [:br]
-  [:code " {:flower \"sunflower\" :color :yellow :id 103}]"]]
+  [:code " {:name \"sunflower\" :color :yellow :id 103}]"]]
 
  [:p "Notice how the data values of each row are unique within its column. There
  is only one "
   [:code "\"rose\""]
   " entry in the "
-  [:code ":flower"]
+  [:code ":name"]
   " column, and only one "
   [:code ":orange"]
   " entry in the "
@@ -98,20 +98,22 @@
 
  [:p "A record conveys the idea "
   [:em "These, and only these, are the fields of our expected data"]
-  ", and mechanically enforces that idea. Let's explicitly stipulate that our
- data has exactly a "
-  [:em "flower"]
+  ", and mechanically enforces that idea. Let's explicitly stipulate that every
+ row has exactly a "
+  [:em "name"]
   ", a "
   [:em "color"]
   ", and an "
   [:em "id"]
   " by defining a record."]
 
- [:pre (print-form-then-eval "(defrecord Flower [flower color id])")]
+ [:pre (print-form-then-eval "(defrecord Flower [name color id])")]
 
  [:p "Now, we create an instance that holds the row of data for a rose."]
 
- [:pre (print-form-then-eval "(->Flower \"rose\" :red 101)" 75 75)]
+ [:pre (replace-ns-str
+        (print-form-then-eval "(->Flower \"rose\" :red 101)" 75 75)
+        replacement-ns-str)]
 
  [:p "And just for completeness, we'll re-make our vector, exchanging hash-maps
  for records."]
@@ -124,7 +126,7 @@
 
  [:p "We've improved our situation somewhat. We've explicitly declared our
  expected fields as exactly "
-  [:code ":flower"]
+  [:code ":name"]
   ", "
   [:code ":color"]
   ", and "
@@ -155,20 +157,26 @@
   [:code "->Flower"]
   "."]
 
- [:pre (print-form-then-eval "(look-up [[\"rose\" :red 101]
-                                        [\"hibiscus\" :orange 102]
-                                        [\"sunflower\" :yellow 103]]
-                                       ->Flower)" 50 75)]
+ [:pre
+  (replace-ns-str
+   (print-form-then-eval "(look-up [[\"rose\" :red 101]
+                                    [\"hibiscus\" :orange 102]
+                                    [\"sunflower\" :yellow 103]]
+                                   ->Flower)" 50 75)
+   replacement-ns-str)]
 
  [:p "Yikes. That's gnarly. Let's inspect the internal representation by
  invoking the "
   [:code "table"]
   " method."]
 
- [:pre (print-form-then-eval "(table (look-up [[\"rose\" :red 101]
-                                               [\"hibiscus\" :orange 102]
-                                               [\"sunflower\" :yellow 103]]
-                                              ->Flower))" 55 75)]
+ [:pre
+  (replace-ns-str
+   (print-form-then-eval "(table (look-up [[\"rose\" :red 101]
+                                           [\"hibiscus\" :orange 102]
+                                           [\"sunflower\" :yellow 103]]
+                                          ->Flower))" 55 75)
+   replacement-ns-str)]
 
  [:p "That looks okay. We can see all our flower data arranged as we expect.
  What's not immediately apparent is that before pushing each record onto the
@@ -191,11 +199,14 @@
  [:p "Let's try to make an instance where the third row's flower is also red,
  illegally repeating the rose's color."]
 
- [:pre (print-form-then-eval "(try (look-up [[\"rose\" :red 101]
-                                             [\"hibiscus\" :orange 102]
-                                             [\"tulip\" :red 103]]
-                                            ->Flower)
-(catch Exception e (.getMessage e)))" 55 75)]
+ [:pre
+  (replace-ns-str
+   (print-form-then-eval "(try (look-up [[\"rose\" :red 101]
+                                         [\"hibiscus\" :orange 102]
+                                         [\"tulip\" :red 103]]
+                                        ->Flower)
+(catch Exception e (.getMessage e)))" 55 75)
+   replacement-ns-str)]
 
  [:p "Nope. "
   [:code "look-up"]
@@ -205,7 +216,7 @@
   ", we want only one answer. In fact, let's ask that question. To streamline
  the discussion, we'll create a "
   [:code "LookUp"]
-  " instance containing flower data and give it a name."]
+  " instance containing flower data and bind it to a symbol."]
 
  [:pre
   (print-form-then-eval "(def flowers-3 (look-up [[\"rose\" :red 101]
@@ -218,7 +229,7 @@
   " method, we retrieve the value."]
 
  [:pre
-  (print-form-then-eval "(get-val flowers-3 :color :red :flower)")]
+  (print-form-then-eval "(get-val flowers-3 :color :red :name)")]
 
  [:p "From left to right, it reads "
   [:em "From the "
@@ -228,7 +239,7 @@
    " is "
    [:code ":red"]
    ", and return the value associated to "
-   [:code ":flower"]
+   [:code ":name"]
    "."]]
 
  [:p "One of the Clojure's niceties is that collections implement the function
@@ -239,14 +250,14 @@
   [:code "get-val"]
   "."]
 
- [:pre (print-form-then-eval "(flowers-3 :color :red :flower)")]
+ [:pre (print-form-then-eval "(flowers-3 :color :red :name)")]
 
- [:p "Let's do a quick demonstration of flower+color and color+flower that the
+ [:p "Let's do a quick demonstration of name+color and color+name that the
  plain hash-map struggled with earlier. "]
 
  [:table
   [:tr
-   [:th "flower"]
+   [:th "name"]
    [:th "color"]]
 
   [:tr
@@ -263,9 +274,9 @@
  
  [:p "First, we create a symmetric one-to-one relationship."]
 
- [:pre (print-form-then-eval "(def flowers-4 (look-up [{:flower \"rose\" :color :red}
-                                                        {:flower \"hibiscus\" :color :orange}
-                                                        {:flower \"sunflower\" :color :yellow}]))")]
+ [:pre (print-form-then-eval "(def flowers-4 (look-up [{:name \"rose\" :color :red}
+                                                       {:name \"hibiscus\" :color :orange}
+                                                       {:name \"sunflower\" :color :yellow}]))")]
 
  [:p "The "
   [:code "LookUp"]
@@ -275,23 +286,23 @@
  orange, and only sunflower is yellow."]
 
  [:pre
-  (print-form-then-eval "(flowers-4 :flower \"rose\" :color)")
+  (print-form-then-eval "(flowers-4 :name \"rose\" :color)")
   [:br]
-  (print-form-then-eval "(flowers-4 :flower \"hibiscus\" :color)")
+  (print-form-then-eval "(flowers-4 :name \"hibiscus\" :color)")
   [:br]
-  (print-form-then-eval "(flowers-4 :flower \"sunflower\" :color)")]
+  (print-form-then-eval "(flowers-4 :name \"sunflower\" :color)")]
 
  [:p "Furthermore, red is only rose, orange is only hibiscus, and yellow is only
  sunflower."]
 
  [:pre
-  (print-form-then-eval "(flowers-4 :color :red :flower)")
+  (print-form-then-eval "(flowers-4 :color :red :name)")
   [:br]
-  (print-form-then-eval "(flowers-4 :color :orange :flower)")
+  (print-form-then-eval "(flowers-4 :color :orange :name)")
   [:br]
-  (print-form-then-eval "(flowers-4 :color :yellow :flower)")]
+  (print-form-then-eval "(flowers-4 :color :yellow :name)")]
 
- [:p "Finally, let's really stretch by adding a couple more columns. "
+ [:p "Finally, let's really stretch by adding a couple more columns: "
   [:em "family"]
   " and "
   [:em "leaves"]
@@ -299,7 +310,7 @@
 
  [:table
   [:tr
-   [:th "flower"]
+   [:th "name"]
    [:th "color"]
    [:th "ID"]
    [:th "family"]
@@ -332,7 +343,7 @@
   [:code "leaves"]
   "."]
 
- [:pre (print-form-then-eval "(defrecord Flower-power [flower color id family leaves])")]
+ [:pre (print-form-then-eval "(defrecord Flower-power [name color id family leaves])")]
 
  [:p "Next, we create a new "
   [:code "LookUp"]
@@ -343,18 +354,18 @@
   "."]
 
  [:pre (print-form-then-eval "(def flowers-5 (look-up [[\"rose\" :red 101 \"Rosaceae\" :pinnate]
-                                                         [\"hibiscus\" :orange 102 \"Malvaveae\" :lanceolate]
-                                                         [\"sunflower\" :yellow 103 \"Asteraceae\" :cardioid]]
-                                                        ->Flower-power))")]
+                                                       [\"hibiscus\" :orange 102 \"Malvaveae\" :lanceolate]
+                                                       [\"sunflower\" :yellow 103 \"Asteraceae\" :cardioid]]
+                                                      ->Flower-power))")]
 
  [:p "Now, let's try some look ups."]
 
  [:pre
-  (print-form-then-eval "(flowers-5 :flower \"rose\" :family)")
+  (print-form-then-eval "(flowers-5 :name \"rose\" :family)")
   [:br]
   (print-form-then-eval "(flowers-5 :id 103 :leaves)")
   [:br]
-  (print-form-then-eval "(flowers-5 :family \"Asteraceae\" :flower)")]
+  (print-form-then-eval "(flowers-5 :family \"Asteraceae\" :name)")]
 
  [:p "Dandy."]
 

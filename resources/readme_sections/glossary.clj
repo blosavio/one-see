@@ -6,7 +6,7 @@
 
  [:table
   [:tr
-   [:th "flower"]
+   [:th "name"]
    [:th "color"]
    [:th "ID"]]
 
@@ -30,7 +30,7 @@
   [:dd
    [:p "A vertical chuck of related data within a category. Concretely, the
  header labels of a table ("
-    [:em "flower"]
+    [:em "name"]
     ", "
     [:em "color"]
     ", and "
@@ -42,9 +42,10 @@
     [:em "hibiscus"]
     ", and "
     [:em "sunflower"]
-    " make up a column of "
-    [:em "flower"]
-    " data."]]
+    " make up a "
+    [:em "name"]
+    " column of "
+    " flower data."]]
 
   [:dt#one-to-one "symmetrical one-to-one"]
   [:dd
@@ -79,11 +80,25 @@
     ", and "
     [:em "101"]
     " above). Each value is unique among its siblings in other rows. The
- keys/fields are identical between rows, i.e., "
+ keys/fields are identical between rows."]
+
+   [:p "For example, the second row with "
     [:em "hibiscus"]
-    " in the "
-    [:em "flower"]
-    " column of row 2 above is unique from the other values in that column."]]
+    " has columns "
+    [:em "name"]
+    ", "
+    [:em "color"]
+    ", and "
+    [:em "ID"]
+    " exactly as the first and third rows, but the "
+    [:em "hibiscus"]
+    " value in the "
+    [:em "name"]
+    " column of row 2 above is unique from the other values in that column, "
+    [:em "rose"]
+    " and "
+    [:em "sunflower"]
+    "."]]
 
   [:dt#table "table"]
   [:dd

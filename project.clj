@@ -1,4 +1,4 @@
-(defproject com.sagevisuals/one-see "0-SNAPSHOT0"
+(defproject com.sagevisuals/one-see "0-SNAPSHOT1"
   :description "A featherweight Clojure library for symmetric one-to-one look ups"
   :url "https://github.com/blosavio/one-see"
   :license {:name "MIT License"
@@ -22,7 +22,7 @@
   :aliases {"readmoi" ["run" "-m" "readmoi-generator"]
             "chlog" ["run" "-m" "chlog-generator"]}
   :codox {:metadata {:doc/format :markdown}
-          :namespaces [#"^one-see"] #_[#"^one-see\.(?!scratch)"]
+          :namespaces [#"^one-see\.(?!scratch)"]
           :target-path "doc"
           :output-path "doc"
           :doc-files []

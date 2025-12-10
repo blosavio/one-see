@@ -23,5 +23,5 @@
 
  [:h3 "Require"]
 
- [:pre (print-form-then-eval "(require '[one-see.scratch :refer [look-up get-val table]])")]]
+ [:pre (print-form-then-eval "(require '[one-see.core :refer [look-up get-val table]])")]]
 

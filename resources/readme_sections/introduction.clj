@@ -2,11 +2,11 @@
  [:h2 "Introduction"]
 
  [:p "Pretend we've got some flower data with the requirement that each flower
- has one color and each color associates to exactly one flower."]
+ name has one color and each color associates to exactly one flower name."]
 
  [:table
   [:tr
-   [:th "flower"]
+   [:th "name"]
    [:th "color"]]
 
   [:tr
@@ -23,7 +23,7 @@
 
  [:p "If we'd like to know "
   [:em "What color is a rose?"]
-  ", we might establish the flower+color relationship with a hash-map."]
+  ", we might establish the name+color relationship with a hash-map."]
 
  [:pre
   (update
@@ -39,7 +39,7 @@
 
  [:p " If we'd like to go in the other direction and ask "
   [:em "Which flower is orange?"]
-  ", we could invert the hash-map to establish a color+flower relationship."]
+  ", we could invert the hash-map to establish a color+name relationship."]
 
  [:pre
   (print-form-then-eval "(require '[clojure.set :refer [map-invert]])")
@@ -54,11 +54,11 @@
  [:p "Manual inversion is perhaps a bit awkward, but let's press on."]
 
  [:p "Now pretend we want to add a third column of data: a unique ID for each
- flower+color. Every pairwise combination of flower, color, and ID is unique."]
+ name+color. Every pairwise combination of name, color, and ID is unique."]
 
  [:table
   [:tr
-   [:th "flower"]
+   [:th "name"]
    [:th "color"]
    [:th "ID"]]
 
@@ -77,7 +77,7 @@
    [:td "yellow"]
    [:td "103"]]]
 
- [:p "Only rose is red. Only orange is linked to ID 102. Etc."]
+ [:p "Only rose is red. Only orange is linked to ID 102, etc."]
 
  [:p "Our previous tactic of using a hash-map won't work. A hash-map only
  supports one-to-one relationships. We could get there with some gymnastics.
@@ -85,11 +85,11 @@
 
  [:pre
   (print-form-then-eval
-   "(def flowers-2 [{:flower \"rose\" :color :red :id 101}
-                 {:flower \"hibiscus\" :color :orange :id 102}
-                 {:flower \"sunflower\" :Color :yellow :id 103}])")]
+   "(def flowers-2 [{:name \"rose\" :color :red :id 101}
+                 {:name \"hibiscus\" :color :orange :id 102}
+                 {:name \"sunflower\" :Color :yellow :id 103}])")]
 
- [:p#naive "We can walk through the vector with "
+ [:p#naive "We walk through the vector with "
   [:code "some"]
   " which returns the first logical "
   [:code "true"]
@@ -98,7 +98,7 @@
  [:pre
   [:code ";; What flower is red?"]
   [:br]
-  (print-form-then-eval "(:flower (some #(when (= :red (% :color)) %) flowers-2))")
+  (print-form-then-eval "(:name (some #(when (= :red (% :color)) %) flowers-2))")
   [:br]
   [:br]
   [:code ";; What is the ID of the orange flower?"]
@@ -112,13 +112,13 @@
  [:p "And there's no enforcement of consistency. Notice, I made a keyboarding
  error. "
   [:code ":Color"]
-  " should be "
+  " in the last row should be "
   [:code ":color"]
   " with lower case 'c' to match the others. This error in the data makes our
  otherwise valid query fail."]
 
  [:pre
-  (print-form-then-eval "(:flower (some #(when (= :yellow (% :color)) %) flowers-2))")]
+  (print-form-then-eval "(:name (some #(when (= :yellow (% :color)) %) flowers-2))")]
 
  [:p "We fail to find a match because of the inconsistent `:Color` entry in
  `flowers-2`"]
