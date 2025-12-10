@@ -82,7 +82,7 @@
     " above). Each value is unique among its siblings in other rows. The
  keys/fields are identical between rows."]
 
-   [:p "For example, the second row with "
+   [:p "In the example above, the second row with "
     [:em "hibiscus"]
     " has columns "
     [:em "name"]
@@ -94,7 +94,7 @@
     [:em "hibiscus"]
     " value in the "
     [:em "name"]
-    " column of row 2 above is unique from the other values in that column, "
+    " column of row 2 is unique from the other values in that column, "
     [:em "rose"]
     " and "
     [:em "sunflower"]

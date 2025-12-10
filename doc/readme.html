@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
-    <meta charset="utf-8" compile-date="2025-12-10 10:44:29" content="width=device-width, initial-scale=1" name="viewport">
+    <meta charset="utf-8" compile-date="2025-12-10 10:54:36" content="width=device-width, initial-scale=1" name="viewport">
     <link href="project.css" rel="stylesheet" type="text/css">
     <title>
       One-see — A featherweight Clojure library for symmetric one-to-one look ups
@@ -306,7 +306,7 @@
           ["sunflower" :yellow 103]]
          -&gt;Flower)
 ;; =&gt; #object
-;;     [one_see.core$make_look_up$reify__23812 0x3dcbd0e9
+;;     [one_see.core$make_look_up$reify__23812 0x3c76926
 ;;      "[#example_ns.Flower{:name \"rose\", :color :red, :id 101} #example_ns.Flower{:name \"hibiscus\", :color :orange, :id 102} #example_ns.Flower{:name \"sunflower\", :color :yellow, :id 103}]"]</code></pre>
       <p>
         Yikes. That's gnarly. Let's inspect the internal representation by invoking the <code>table</code> method.
@@ -646,9 +646,9 @@
             rows. The keys/fields are identical between rows.
           </p>
           <p>
-            For example, the second row with <em>hibiscus</em> has columns <em>name</em>, <em>color</em>, and <em>ID</em> exactly as the first and third rows,
-            but the <em>hibiscus</em> value in the <em>name</em> column of row&nbsp;2 above is unique from the other values in that column, <em>rose</em> and
-            <em>sunflower</em>.
+            In the example above, the second row with <em>hibiscus</em> has columns <em>name</em>, <em>color</em>, and <em>ID</em> exactly as the first and
+            third rows, but the <em>hibiscus</em> value in the <em>name</em> column of row&nbsp;2 is unique from the other values in that column, <em>rose</em>
+            and <em>sunflower</em>.
           </p>
         </dd>
         <dt id="table">

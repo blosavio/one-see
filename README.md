@@ -299,7 +299,7 @@
 &nbsp;         [&quot;sunflower&quot; :yellow 103]]
 &nbsp;        -&gt;Flower)
 ;; =&gt; #object
-;;     [one_see.core$make_look_up$reify__23812 0x3dcbd0e9
+;;     [one_see.core$make_look_up$reify__23812 0x3c76926
 ;;      &quot;[#example_ns.Flower{:name \&quot;rose\&quot;, :color :red, :id 101} #example_ns.Flower{:name \&quot;hibiscus\&quot;, :color :orange, :id 102} #example_ns.Flower{:name \&quot;sunflower\&quot;, :color :yellow, :id 103}]&quot;]</code></pre>
       <p>
         Yikes. That&apos;s gnarly. Let&apos;s inspect the internal representation by &nbsp;invoking the <code>table</code> method.
@@ -640,9 +640,9 @@
             rows. The keys/fields are identical between rows.
           </p>
           <p>
-            For example, the second row with <em>hibiscus</em> has columns <em>name</em>, <em>color</em>, and <em>ID</em> exactly as the first and third rows,
-            but the <em>hibiscus</em> value in the <em>name</em> column of row&nbsp;2 above is unique from the other values in that column, <em>rose</em> and
-            <em>sunflower</em>.
+            In the example above, the second row with <em>hibiscus</em> has columns <em>name</em>, <em>color</em>, and <em>ID</em> exactly as the first and
+            third rows, but the <em>hibiscus</em> value in the <em>name</em> column of row&nbsp;2 is unique from the other values in that column, <em>rose</em>
+            and <em>sunflower</em>.
           </p>
         </dd>
         <dt id="table">

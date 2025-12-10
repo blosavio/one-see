@@ -41,10 +41,7 @@
 
 (defprotocol LookUp
   "Methods for arranging symmetric one-to-one relationships and performing
-  efficient look ups.
-
-  Use [[look-up]] for creating an instance. Instances implement the `invoke`
-  methods of `clojure.lang.IFn` with [[get-val]].
+  efficient look ups. Use [[look-up]] to create an instance.
 
   Sample data for the following examples:
 
@@ -79,7 +76,7 @@
     [this col val not-found]
     "Returns the row containing value `val` located in column `col`.
 
-  Example query: *Return the row whose `:name` is `\"rose\"`.*
+  Example query: *Return the row from `flowers` whose `:name` is `\"rose\"`.*
   ```clojure
   (get-row flowers :name \"rose\")
   ;; => #one_see.Flower{:name \"rose\", :color :red, :id 101}
@@ -89,13 +86,16 @@
     [this col-1 val-1 col-2]
     [this col-1 val-1 col-2 not-found]
     "Efficiently finds the row whose `val-1` is located in column `col-1`, then
- returns `val-2` located in `col-2` of that row. If not found, returns `nil` or
- `not-found`.
+  returns `val-2` located in `col-2` of that row. If not found, returns `nil` or
+  `not-found`.
 
-  `get-val` provides the `invoke` implementation, so a `LookUp` instance in the
-  function position delegates to `get-val`.
+  `get-val` provides the `invoke` implementation of the `clojure.lang.IFn`
+  interface, so a `LookUp` instance in the function position delegates to
+  `get-val`.
 
-  Example query: *What is the `:id` of the row whose `:name` is `\"rose\"`?*
+
+  Example query: *Return the value of `:id` of the row whose `:name` is
+  `\"rose\"`?*
 
   Example, explicit invocation:
   ```clojure
@@ -150,27 +150,27 @@
 
 
 (defn look-up
-  "Establishes symmetric one-to-one relationships and returns a [[LookUp]]
-  instance which provides efficient look ups.
+  "Returns a [[LookUp]] instance which provides efficient look ups of symmetric
+  one-to-one relationships.
 
-  A lone `s` is a sequential of hash-maps. If given a sequential `s` of field
-  values and a record constructor `->rec`, invokes the constructor with the
-  elements of `s`. Prefer this later, two-arity version.
+  The 1-arity invocation accepts a sequential `s` of hash-maps. The 2-arity
+  invocation (preferred) accepts a sequential `s` of sequentials containing
+  record field values followed by a record constructor `->rec`.
 
   Throws an exception:
 
   1. If key/fields don't exactly match, or
   2. If a value is not unique within its column.
 
-  Example, 1-arity consuming a sequence of hash-maps:
+  Example, 1-arity consuming a sequential of hash-maps:
   ```clojure
   (look-up [{:name \"rose\" :color :red :id 101}
             {:name \"hibiscus\" :color :orange :id 102}
             {:name \"sunflower\" :color :sunflower :id 103}])
   ```
 
-  Example, 2-arity consuming a sequence of field values plus a record
-  constructor (preferred):
+  Example, 2-arity consuming a sequential of sequentials containing field values
+  plus a record constructor (preferred):
   ```clojure
   (defrecord Flower [flower color id])
 
