@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
-    <meta charset="utf-8" compile-date="2025-12-11 09:01:30" content="width=device-width, initial-scale=1" name="viewport">
+    <meta charset="utf-8" compile-date="2025-12-11 09:08:32" content="width=device-width, initial-scale=1" name="viewport">
     <link href="project.css" rel="stylesheet" type="text/css">
     <title>
       One-see — A featherweight Clojure library for symmetric one-to-one look ups
@@ -305,9 +305,7 @@
           ["hibiscus" :orange 102]
           ["sunflower" :yellow 103]]
          -&gt;Flower)
-;; =&gt; #object
-;;     [one_see.core$make_look_up$reify__276 0x2df50a2a
-;;      "[#example_ns.Flower{:name \"rose\", :color :red, :id 101} #example_ns.Flower{:name \"hibiscus\", :color :orange, :id 102} #example_ns.Flower{:name \"sunflower\", :color :yellow, :id 103}]"]</code></pre>
+;; =&gt; make-look-up</code></pre>
       <p>
         Yikes. That's gnarly. Let's inspect the internal representation by invoking the <code>table</code> method.
       </p>
@@ -524,8 +522,9 @@
         <li>
           <p>
             <strong>Values do not need to be the same type as other values in their column.</strong> A <code>LookUp</code> instance imposes no restrictions on
-            the type of a value. It merely must be unique from the other values. In this example, the column contains three values which happen to be keywords,
-            <code>:red</code>, <code>:orange</code>, and <code>:yellow</code>, plus one string, <code>"indigo"</code>. All values are unique, so no problem.
+            the type of a value. It merely must be unique from the other values. In this example, the <code>:color</code> column contains three values which
+            happen to be keywords, <code>:red</code>, <code>:orange</code>, and <code>:yellow</code>, plus one string, <code>"indigo"</code>. All values are
+            unique, so no problem.
           </p>
         </li>
         <li>

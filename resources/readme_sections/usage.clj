@@ -394,8 +394,9 @@
  their column."]
     " A "
     [:code "LookUp"] " instance imposes no restrictions on the type of a value.
- It merely must be unique from the other values. In this example, the column
- contains three values which happen to be keywords, "
+ It merely must be unique from the other values. In this example, the "
+    [:code ":color"]
+    " column contains three values which happen to be keywords, "
     [:code ":red"]
     ", "
     [:code ":orange"]

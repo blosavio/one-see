@@ -298,9 +298,7 @@
 &nbsp;         [&quot;hibiscus&quot; :orange 102]
 &nbsp;         [&quot;sunflower&quot; :yellow 103]]
 &nbsp;        -&gt;Flower)
-;; =&gt; #object
-;;     [one_see.core$make_look_up$reify__276 0x2df50a2a
-;;      &quot;[#example_ns.Flower{:name \&quot;rose\&quot;, :color :red, :id 101} #example_ns.Flower{:name \&quot;hibiscus\&quot;, :color :orange, :id 102} #example_ns.Flower{:name \&quot;sunflower\&quot;, :color :yellow, :id 103}]&quot;]</code></pre>
+;; =&gt; make-look-up</code></pre>
       <p>
         Yikes. That&apos;s gnarly. Let&apos;s inspect the internal representation by &nbsp;invoking the <code>table</code> method.
       </p>
@@ -517,9 +515,9 @@
         <li>
           <p>
             <strong>Values do not need to be the same type as other values in their column.</strong> A <code>LookUp</code> instance imposes no restrictions on
-            the type of a value. It merely must be unique from the other values. In this example, the column contains three values which happen to be keywords,
-            <code>:red</code>, <code>:orange</code>, and <code>:yellow</code>, plus one string, <code>&quot;indigo&quot;</code>. All values are unique, so no
-            problem.
+            the type of a value. It merely must be unique from the other values. In this example, the <code>:color</code> column contains three values which
+            happen to be keywords, <code>:red</code>, <code>:orange</code>, and <code>:yellow</code>, plus one string, <code>&quot;indigo&quot;</code>. All
+            values are unique, so no problem.
           </p>
         </li>
         <li>
