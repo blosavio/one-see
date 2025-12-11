@@ -369,6 +369,59 @@
 
  [:p "Dandy."]
 
+ [:h3 "Non-Rules"]
+
+ [:p "To demonstrate a couple of points, let's add another row. We'll use the
+ 1-arity version of "
+  [:code "look-up"]
+  " that accepts hash-maps."]
+
+ [:pre
+  (print-form-then-eval
+   "(def flowers-6 (look-up [{:name \"rose\" :color :red :id 101}
+                             {:name \"hibiscus\" :color :orange :id 102}
+                             {:name \"sunflower\" :color :yellow :id 103}
+                             {:name \"indigo\" :color \"indigo\" :id 104}]))")]
+
+ [:p "Pay particular attention to the new line at the bottom: string "
+  [:code "\"indigo\""]
+  " appears twice."]
+
+ [:ol
+  [:li
+   [:p
+    [:strong "Values do not need to be the same type as other values in
+ their column."]
+    " A "
+    [:code "LookUp"] " instance imposes no restrictions on the type of a value.
+ It merely must be unique from the other values. In this example, the column
+ contains three values which happen to be keywords, "
+    [:code ":red"]
+    ", "
+    [:code ":orange"]
+    ", and "
+    [:code ":yellow"]
+    ", plus one string, "
+    [:code "\"indigo\""]
+    ". All values are unique, so no problem."]]
+
+  [:li
+   [:p
+    [:strong "Values do not need to be unique within their row."]
+    " "
+    [:code "\"indigo\""]
+    " in the "
+    [:code ":name"]
+    " column relates one-to-one with "
+    [:code "\"indigo\""]
+    " in the "
+    [:code ":color"]
+    " column, which relates one-to-one with "
+    [:code "104"]
+    " in the "
+    [:code ":id"]
+    " column."]]]
+
  [:h3 "Performance considerations"]
 
  [:p "A "

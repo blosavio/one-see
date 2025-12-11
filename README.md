@@ -299,7 +299,7 @@
 &nbsp;         [&quot;sunflower&quot; :yellow 103]]
 &nbsp;        -&gt;Flower)
 ;; =&gt; #object
-;;     [one_see.core$make_look_up$reify__23812 0x3c76926
+;;     [one_see.core$make_look_up$reify__276 0x2df50a2a
 ;;      &quot;[#example_ns.Flower{:name \&quot;rose\&quot;, :color :red, :id 101} #example_ns.Flower{:name \&quot;hibiscus\&quot;, :color :orange, :id 102} #example_ns.Flower{:name \&quot;sunflower\&quot;, :color :yellow, :id 103}]&quot;]</code></pre>
       <p>
         Yikes. That&apos;s gnarly. Let&apos;s inspect the internal representation by &nbsp;invoking the <code>table</code> method.
@@ -500,6 +500,37 @@
         Dandy.
       </p>
       <h3>
+        Non-Rules
+      </h3>
+      <p>
+        To demonstrate a couple of points, let&apos;s add another row. We&apos;ll use the &nbsp;1-arity version of <code>look-up</code> that accepts hash-maps.
+      </p>
+      <pre><code>(def flowers-6
+&nbsp; (look-up [{:name &quot;rose&quot;, :color :red, :id 101}
+&nbsp;           {:name &quot;hibiscus&quot;, :color :orange, :id 102}
+&nbsp;           {:name &quot;sunflower&quot;, :color :yellow, :id 103}
+&nbsp;           {:name &quot;indigo&quot;, :color &quot;indigo&quot;, :id 104}]))</code></pre>
+      <p>
+        Pay particular attention to the new line at the bottom: string <code>&quot;indigo&quot;</code> appears twice.
+      </p>
+      <ol>
+        <li>
+          <p>
+            <strong>Values do not need to be the same type as other values in their column.</strong> A <code>LookUp</code> instance imposes no restrictions on
+            the type of a value. It merely must be unique from the other values. In this example, the column contains three values which happen to be keywords,
+            <code>:red</code>, <code>:orange</code>, and <code>:yellow</code>, plus one string, <code>&quot;indigo&quot;</code>. All values are unique, so no
+            problem.
+          </p>
+        </li>
+        <li>
+          <p>
+            <strong>Values do not need to be unique within their row.</strong> <code>&quot;indigo&quot;</code> in the <code>:name</code> column relates
+            one-to-one with <code>&quot;indigo&quot;</code> in the <code>:color</code> column, which relates one-to-one with <code>104</code> in the
+            <code>:id</code> column.
+          </p>
+        </li>
+      </ol>
+      <h3>
         Performance considerations
       </h3>
       <p>
@@ -665,7 +696,7 @@
     <p></p>
     <p id="page-footer">
       Copyright © 2024–2025 Brad Losavio.<br>
-      Compiled by <a href="https://github.com/blosavio/readmoi">ReadMoi</a> on 2025 December 10.<span id="uuid"><br>
+      Compiled by <a href="https://github.com/blosavio/readmoi">ReadMoi</a> on 2025 December 11.<span id="uuid"><br>
       73cc3518-fba1-4140-95ef-23586eae86d1</span>
     </p>
   </body>

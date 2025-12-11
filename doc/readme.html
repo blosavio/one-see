@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
-    <meta charset="utf-8" compile-date="2025-12-10 10:54:36" content="width=device-width, initial-scale=1" name="viewport">
+    <meta charset="utf-8" compile-date="2025-12-11 09:01:30" content="width=device-width, initial-scale=1" name="viewport">
     <link href="project.css" rel="stylesheet" type="text/css">
     <title>
       One-see — A featherweight Clojure library for symmetric one-to-one look ups
@@ -306,7 +306,7 @@
           ["sunflower" :yellow 103]]
          -&gt;Flower)
 ;; =&gt; #object
-;;     [one_see.core$make_look_up$reify__23812 0x3c76926
+;;     [one_see.core$make_look_up$reify__276 0x2df50a2a
 ;;      "[#example_ns.Flower{:name \"rose\", :color :red, :id 101} #example_ns.Flower{:name \"hibiscus\", :color :orange, :id 102} #example_ns.Flower{:name \"sunflower\", :color :yellow, :id 103}]"]</code></pre>
       <p>
         Yikes. That's gnarly. Let's inspect the internal representation by invoking the <code>table</code> method.
@@ -507,6 +507,35 @@
         Dandy.
       </p>
       <h3>
+        Non-Rules
+      </h3>
+      <p>
+        To demonstrate a couple of points, let's add another row. We'll use the 1-arity version of <code>look-up</code> that accepts hash-maps.
+      </p>
+      <pre><code>(def flowers-6
+  (look-up [{:name "rose", :color :red, :id 101}
+            {:name "hibiscus", :color :orange, :id 102}
+            {:name "sunflower", :color :yellow, :id 103}
+            {:name "indigo", :color "indigo", :id 104}]))</code></pre>
+      <p>
+        Pay particular attention to the new line at the bottom: string <code>"indigo"</code> appears twice.
+      </p>
+      <ol>
+        <li>
+          <p>
+            <strong>Values do not need to be the same type as other values in their column.</strong> A <code>LookUp</code> instance imposes no restrictions on
+            the type of a value. It merely must be unique from the other values. In this example, the column contains three values which happen to be keywords,
+            <code>:red</code>, <code>:orange</code>, and <code>:yellow</code>, plus one string, <code>"indigo"</code>. All values are unique, so no problem.
+          </p>
+        </li>
+        <li>
+          <p>
+            <strong>Values do not need to be unique within their row.</strong> <code>"indigo"</code> in the <code>:name</code> column relates one-to-one with
+            <code>"indigo"</code> in the <code>:color</code> column, which relates one-to-one with <code>104</code> in the <code>:id</code> column.
+          </p>
+        </li>
+      </ol>
+      <h3>
         Performance considerations
       </h3>
       <p>
@@ -671,7 +700,7 @@
     <p></p>
     <p id="page-footer">
       Copyright © 2024–2025 Brad Losavio.<br>
-      Compiled by <a href="https://github.com/blosavio/readmoi">ReadMoi</a> on 2025 December 10.<span id="uuid"><br>
+      Compiled by <a href="https://github.com/blosavio/readmoi">ReadMoi</a> on 2025 December 11.<span id="uuid"><br>
       73cc3518-fba1-4140-95ef-23586eae86d1</span>
     </p>
   </body>

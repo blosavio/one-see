@@ -19,9 +19,6 @@
                          print-form-then-eval]]))
 
 
-(readmoi.core/-main)
-
-
 (defn replace-ns-str
   "When a `print-form-then-eval` returns a `[:code <string>]` with the ReadMoi
   ns, replace it with string `replacement`."
@@ -35,4 +32,7 @@
 ;; underscores, not hyphens.
 
 (def replacement-ns-str "example_ns")
+
+
+(readmoi.core/-main)
 
