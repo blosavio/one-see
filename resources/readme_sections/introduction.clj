@@ -120,8 +120,11 @@
  [:pre
   (print-form-then-eval "(:name (some #(when (= :yellow (% :color)) %) flowers-2))")]
 
- [:p "We fail to find a match because of the inconsistent `:Color` entry in
- `flowers-2`"]
+ [:p "We fail to find a match because of the inconsistent "
+  [:code ":Color"]
+  " entry in "
+  [:code "flowers-2"]
+  "."]
 
  [:p
   [:strong

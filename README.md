@@ -167,7 +167,7 @@
       </p>
       <pre><code>(:name (some #(when (= :yellow (% :color)) %) flowers-2)) ;; =&gt; nil</code></pre>
       <p>
-        We fail to find a match because of the inconsistent `:Color` entry in &nbsp;`flowers-2`
+        We fail to find a match because of the inconsistent <code>:Color</code> entry in <code>flowers-2</code>.
       </p>
       <p>
         <strong>The One-see library supplies a lightweight solution to arranging data with &nbsp;enforced <a href="#one-to-one">symmetric one-to-one</a>
