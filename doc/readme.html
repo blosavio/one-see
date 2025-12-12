@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
-    <meta charset="utf-8" compile-date="2025-12-11 14:06:24" content="width=device-width, initial-scale=1" name="viewport">
+    <meta charset="utf-8" compile-date="2025-12-12 07:19:30" content="width=device-width, initial-scale=1" name="viewport">
     <link href="project.css" rel="stylesheet" type="text/css">
     <title>
       One-see — A featherweight Clojure library for symmetric one-to-one look ups
@@ -305,7 +305,9 @@
           ["hibiscus" :orange 102]
           ["sunflower" :yellow 103]]
          -&gt;Flower)
-;; =&gt; make-look-up</code></pre>
+;; =&gt; #object
+;;     [one_see.core$make_look_up$reify__276 0x6e1d1606
+;;      "[#example_ns.Flower{:name \"rose\", :color :red, :id 101} #example_ns.Flower{:name \"hibiscus\", :color :orange, :id 102} #example_ns.Flower{:name \"sunflower\", :color :yellow, :id 103}]"]</code></pre>
       <p>
         Yikes. That's gnarly. Let's inspect the internal representation by invoking the <code>table</code> method.
       </p>
@@ -699,7 +701,7 @@
     <p></p>
     <p id="page-footer">
       Copyright © 2024–2025 Brad Losavio.<br>
-      Compiled by <a href="https://github.com/blosavio/readmoi">ReadMoi</a> on 2025 December 11.<span id="uuid"><br>
+      Compiled by <a href="https://github.com/blosavio/readmoi">ReadMoi</a> on 2025 December 12.<span id="uuid"><br>
       73cc3518-fba1-4140-95ef-23586eae86d1</span>
     </p>
   </body>
